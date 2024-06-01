@@ -45,7 +45,7 @@ class Product(models.Model):
 
 class Purchase(models.Model):
     products = models.ManyToManyField(Product, blank=True)
-    user = models.ForeignKey(UserProfile, on_delete=models.PROTECT, null=True, blank=True)
+    user = models.OneToOneField(UserProfile, on_delete=models.PROTECT, null=True, blank=True)
 
     def calculate_total_price(self):
         total_price = sum(product.price for product in self.products.all())
