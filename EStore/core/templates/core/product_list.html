@@ -16,8 +16,18 @@
             color: #333;
         }
 
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
         header, footer {
             height: 56px;
+        }
+
+        main {
+            flex: 1;
         }
 
         .product-card {
@@ -51,182 +61,187 @@
         .sort-options {
             margin-bottom: 20px;
         }
+
+        .cart-icon {
+            position: relative;
+        }
+
+        .cart-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Elevator Store</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'product_list' %}">Shop</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'about_us' %}">About Us</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'contacts' %}">Contact</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container my-5">
-        <!-- Search Bar -->
-        <div class="row search-bar">
-            <div class="col-md-12">
-                <input type="text" class="form-control" placeholder="Search for products..." id="search-input">
-            </div>
-        </div>
-
-        <!-- Sort Options -->
-        <div class="row sort-options">
-            <div class="col-md-12">
-                <select class="form-select" id="sort-select">
-                    <option value="popularity">Sort by Popularity</option>
-                    <option value="rating">Sort by Rating</option>
-                    <option value="price_asc">Sort by Price: Low to High</option>
-                    <option value="price_desc">Sort by Price: High to Low</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Product Categories -->
-        <div class="mb-4">
-            <h2>Product Categories</h2>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-primary">All</button>
-                <button type="button" class="btn btn-outline-primary">Category 1</button>
-                <button type="button" class="btn btn-outline-primary">Category 2</button>
-                <button type="button" class="btn btn-outline-primary">Category 3</button>
-            </div>
-        </div>
-
-        <div class="row" id="product-container">
-            <!-- Example Product Card -->
-            <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://source.unsplash.com/400x400/?elevator" class="card-img-top product-image" alt="Product Image">
-                    <div class="card-body">
-                        <h5 class="card-title">Product Name</h5>
-                        <div class="rating">
-                            &#9733; &#9733; &#9733; &#9733; &#9734; (4)
-                        </div>
-                        <p class="product-description">This is a brief description of the product. It gives an overview of the key features and benefits.</p>
-                        <p class="card-text">$199.99</p>
-                        <a href="#" class="btn btn-primary">View Details</a>
+    <div class="wrapper">
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">Elevator Store</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="{% url 'home' %}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="{% url 'product_list' %}">Shop</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'about_us' %}">About Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'contacts' %}">Contact</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#cartModal">
+                                    <div class="cart-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+                                            <path d="M0 1a1 1 0 0 1 1-1h1.5a1 1 0 0 1 .962.725L4.89 5H14a1 1 0 0 1 .9 1.434l-3 6a1 1 0 0 1-.9.566H5a1 1 0 0 1-.9-.566L1.11 7.293 1 7H0V1zm1 0h.986l1.253 5h8.535l2.225-4H5.21L3.287 1H1z"/>
+                                            <path d="M4.5 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm7 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                                        </svg>
+                                        <span class="badge bg-danger">0</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
-            </div>
-            <!-- Repeat similar blocks for more products -->
-            <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://source.unsplash.com/400x400/?elevator,parts" class="card-img-top product-image" alt="Product Image">
-                    <div class="card-body">
-                        <h5 class="card-title">Product Name 2</h5>
-                        <div class="rating">
-                            &#9733; &#9733; &#9733; &#9734; &#9734; (3)
-                        </div>
-                        <p class="product-description">This is another brief description of the product, highlighting its unique selling points.</p>
-                        <p class="card-text">$299.99</p>
-                        <a href="#" class="btn btn-primary">View Details</a>
-                    </div>
+            </nav>
+        </header>
+
+        <main class="container my-5">
+            <!-- Search Bar -->
+            <div class="row search-bar">
+                <div class="col-md-12">
+                    <input type="text" class="form-control" placeholder="Search for products..." id="search-input">
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card product-card">
-                    <img src="https://source.unsplash.com/400x400/?elevator,buttons" class="card-img-top product-image" alt="Product Image">
-                    <div class="card-body">
-                        <h5 class="card-title">Product Name 3</h5>
-                        <div class="rating">
-                            &#9733; &#9733; &#9733; &#9733; &#9733; (5)
-                        </div>
-                        <p class="product-description">This product has a brief description that helps customers understand its features.</p>
-                        <p class="card-text">$149.99</p>
-                        <a href="#" class="btn btn-primary">View Details</a>
-                    </div>
+
+            <!-- Sort Options -->
+            <div class="row sort-options">
+                <div class="col-md-12">
+                    <select class="form-select" id="sort-select">
+                        <option value="price_asc">Sort by Price: Low to High</option>
+                        <option value="price_desc">Sort by Price: High to Low</option>
+                    </select>
                 </div>
             </div>
-            
+
+            <!-- Opening product container div -->
+            <div id="product-container" class="row">
+                {% for part in parts %}
+                <div class="col-md-4 product-item" data-name="{{ part.name }}" data-price="{{ part.price }}">
+                    <div class="card product-card">
+                        <img src="https://source.unsplash.com/400x400/?elevator,buttons" class="card-img-top product-image" alt="Product Image">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ part.name }}</h5>
+                            <div class="rating">
+                                &#9733; &#9733; &#9733; &#9733; &#9733; (5)
+                            </div>
+                            <p class="product-description">{{ part.description }}</p>
+                            <p class="card-text">${{ part.price }}</p>
+                            <a href="#" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
             <!-- Add more products as needed -->
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a></li>
+                </ul>
+            </nav>
+        </main>
+
+        <!-- Cart Modal -->
+        <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cartModalLabel">Your Cart</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Product</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-items">
+                                <!-- Cart items will be dynamically added here -->
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total: $<span id="cart-total">0.00</span></h5>
+                            <button class="btn btn-success">Checkout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Pagination -->
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                    <a class="page-link" href="#">Next</a>
-                </li>
-            </ul>
-        </nav>
-    </main>
-
-    <footer class="bg-dark text-white text-center">
-        <div class="container-fluid">
-            <br>
-            <p>&copy; 2024 Elevator Store. All rights reserved.</p>
-        </div>
-    </footer>
+        <footer class="bg-dark text-white text-center mt-auto">
+            <div class="container-fluid">
+                <br>
+                <p>&copy; 2024 Elevator Store. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
+    <!-- Custom JavaScript -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.querySelector('#search-input');
-            const sortSelect = document.querySelector('#sort-select');
-            const productContainer = document.querySelector('#product-container');
-            const products = Array.from(productContainer.getElementsByClassName('col-md-4'));
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const sortSelect = document.getElementById('sort-select');
+            const productContainer = document.getElementById('product-container');
+            const products = Array.from(document.getElementsByClassName('product-item'));
 
             // Search functionality
-            searchInput.addEventListener('input', function () {
+            searchInput.addEventListener('input', function() {
                 const query = searchInput.value.toLowerCase();
                 products.forEach(product => {
-                    const productName = product.querySelector('.card-title').textContent.toLowerCase();
-                    if (productName.includes(query)) {
-                        product.style.display = 'block';
-                    } else {
-                        product.style.display = 'none';
-                    }
+                    const name = product.getAttribute('data-name').toLowerCase();
+                    product.style.display = name.includes(query) ? 'block' : 'none';
                 });
             });
 
             // Sort functionality
-            sortSelect.addEventListener('change', function () {
-                const sortBy = sortSelect.value;
-                const sortedProducts = [...products];
-
-                sortedProducts.sort((a, b) => {
-                    const priceA = parseFloat(a.querySelector('.card-text').textContent.replace('$', ''));
-                    const priceB = parseFloat(b.querySelector('.card-text').textContent.replace('$', ''));
-                    const ratingA = parseFloat(a.querySelector('.rating').textContent.match(/(\d+)/)[0]);
-                    const ratingB = parseFloat(b.querySelector('.rating').textContent.match(/(\d+)/)[0]);
-
-                    if (sortBy === 'price_asc') return priceA - priceB;
-                    if (sortBy === 'price_desc') return priceB - priceA;
-                    if (sortBy === 'rating') return ratingB - ratingA;
-                    return 0;
+            sortSelect.addEventListener('change', function() {
+                const selectedOption = sortSelect.value;
+                const sortedProducts = products.sort((a, b) => {
+                    const priceA = parseFloat(a.getAttribute('data-price'));
+                    const priceB = parseFloat(b.getAttribute('data-price'));
+                    return selectedOption === 'price_asc' ? priceA - priceB : priceB - priceA;
                 });
 
-                // Clear the container and re-append sorted products
                 productContainer.innerHTML = '';
-                sortedProducts.forEach(product => productContainer.appendChild(product));
+                sortedProducts.forEach(product => {
+                    productContainer.appendChild(product);
+                });
             });
         });
     </script>

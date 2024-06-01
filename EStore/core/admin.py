@@ -1,45 +1,44 @@
 from django.contrib import admin
-from .models import Contract, Part, SecondHandPart, Transaction, Purchase
+from .models import Product, Purchase, Transaction
+from prof.models import UserProfile
 
 
-@admin.register(Contract)
-class ContractAdmin(admin.ModelAdmin):
-    list_display = ('kind', 'count')
+class ProductInline(admin.TabularInline):
+    model = Purchase.products.through
+    extra = 0
+    verbose_name = "Product"
+    verbose_name_plural = "Products"
 
-
-@admin.register(Part)
-class PartAdmin(admin.ModelAdmin):
+@admin.register(Product)
+class Product(admin.ModelAdmin):
     list_display = ('name', 'price', 'kind', 'count', 'manufacturer')
-    search_fields = ('name', 'kind', 'manufacturer')
-    list_filter = ('kind', 'manufacturer')
-
-
-@admin.register(SecondHandPart)
-class SecondHandPartAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'kind', 'manufacturer', 'count')
     search_fields = ('name', 'kind', 'manufacturer')
     list_filter = ('kind', 'manufacturer')
 
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'total_items', 'total_amount', 'discount', 'calculate_discounted_amount')
-    readonly_fields = ('calculate_discounted_amount',)
+    list_display = ('user', 'total_amount', 'get_discounted_amount', 'purchase')
+    list_filter = ('user',)
+    search_fields = ('user__username',)
 
-    def calculate_discounted_amount(self, obj):
+    def get_discounted_amount(self, obj):
         return obj.calculate_discounted_amount()
-    calculate_discounted_amount.short_description = 'Discounted Amount'
+    get_discounted_amount.short_description = 'Discounted Amount'
+
 
 
 @admin.register(Purchase)
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ('user',)
-    filter_horizontal = ('parts', 'second_hand_parts', 'contracts')
-    search_fields = ('user__username',)  # Allows searching purchases by user's username
-    list_filter = ('parts', 'second_hand_parts', 'contracts')
+    inlines = [ProductInline]
+    list_display = ('user', 'get_products')
+    list_filter = ('user',)
+    search_fields = ('user__username',)
+    exclude = ('products',)
 
-# Removing the redundant admin.site.register calls
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('products')
 
-# admin.site.register(Part)
-# admin.site.register(SecondHandPart)
-# admin.site.register(Contract)
+    def get_products(self, obj):
+        return ", ".join([product.name for product in obj.products.all()])
+    get_products.short_description = 'Products'
