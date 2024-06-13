@@ -137,7 +137,7 @@
             <!-- Opening product container div -->
             <div id="product-container" class="row">
                 {% for part in parts %}
-                <div class="col-md-4 product-item" data-name="{{ part.name }}" data-price="{{ part.price }}">
+                <div class="col-md-4 product-item" data-id="{{ part.id }}" data-name="{{ part.name }}" data-price="{{ part.price }}">
                     <div class="card product-card">
                         <img src="https://source.unsplash.com/400x400/?elevator,buttons" class="card-img-top product-image" alt="Product Image">
                         <div class="card-body">
@@ -147,7 +147,7 @@
                             </div>
                             <p class="product-description">{{ part.description }}</p>
                             <p class="card-text">${{ part.price }}</p>
-                            <a href="#" class="btn btn-primary">View Details</a>
+                            <button class="btn btn-primary add-to-cart">Add to Cart</button>
                         </div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
                         </table>
                         <div class="d-flex justify-content-between">
                             <h5>Total: $<span id="cart-total">0.00</span></h5>
-                            <button class="btn btn-success">Checkout</button>
+                            <button class="btn btn-success" id="checkout-button">Checkout</button>
                         </div>
                     </div>
                 </div>
@@ -219,6 +219,9 @@
             const sortSelect = document.getElementById('sort-select');
             const productContainer = document.getElementById('product-container');
             const products = Array.from(document.getElementsByClassName('product-item'));
+            const cartItemsContainer = document.getElementById('cart-items');
+            const cartTotalElement = document.getElementById('cart-total');
+            let cart = [];
 
             // Search functionality
             searchInput.addEventListener('input', function() {
@@ -243,7 +246,93 @@
                     productContainer.appendChild(product);
                 });
             });
+
+            // Add to Cart functionality
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const productElement = this.closest('.product-item');
+                    const productId = productElement.getAttribute('data-id');
+                    const productName = productElement.getAttribute('data-name');
+                    const productPrice = parseFloat(productElement.getAttribute('data-price'));
+
+                    const existingCartItem = cart.find(item => item.id === productId);
+                    if (existingCartItem) {
+                        existingCartItem.quantity++;
+                    } else {
+                        cart.push({ id: productId, name: productName, price: productPrice, quantity: 1 });
+                    }
+
+                    updateCart();
+                });
+            });
+
+            function updateCart() {
+        cartItemsContainer.innerHTML = '';
+        let total = 0;
+        cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            const row = document.createElement('tr');
+            row.dataset.id = item.id;  // Add data-id attribute
+            row.innerHTML = `
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>$${item.price.toFixed(2)}</td>
+                <td>$${itemTotal.toFixed(2)}</td>
+                <td><button class="btn btn-sm btn-danger remove-from-cart" data-id="${item.id}">Remove</button></td>
+            `;
+            cartItemsContainer.appendChild(row);
         });
+        cartTotalElement.textContent = total.toFixed(2);
+
+        document.querySelectorAll('.remove-from-cart').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-id');
+                cart = cart.filter(item => item.id !== productId);
+                updateCart();
+            });
+        });
+
+        document.querySelector('.cart-icon .badge').textContent = cart.length;
+    }
+
+    document.getElementById('checkout-button').addEventListener('click', function() {
+        const cartItems = Array.from(document.querySelectorAll('#cart-items tr')).map(row => row.dataset.id);
+        console.log(cartItems)
+        if (cartItems.length === 0) {
+            alert('Cart is empty!');
+            return;
+        }
+
+        // Send the cart data to the backend Django view via AJAX
+        fetch("{% url 'checkout' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'  // Ensure this is correctly set
+            },
+            body: JSON.stringify({
+                cart_items: cartItems,
+                discount: 0,  // Example discount value
+                user_id: 1
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => { throw new Error(data.error || 'Something went wrong'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message);
+            // Clear the cart
+            cart = [];
+            updateCart();
+        })
+        .catch(error => alert(error.message));
+    });
+});
     </script>
 </body>
 </html>
