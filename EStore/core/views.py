@@ -23,6 +23,45 @@ def aboutus(request):
 def contact(request):
     return render(request, 'core/Contact.html')
 
+
+# @csrf_exempt
+# def Add_to_cart(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             user_id = data.get('user_id')
+#             product_id = data.get('productid')
+            
+#             # Check if user_id and product_id are provided
+#             if not user_id or not product_id:
+#                 return JsonResponse({'error': 'user_id and productid are required'}, status=400)
+            
+#             # Fetch user profile
+#             try:
+#                 user_profile = UserProfile.objects.get(user__id=user_id)
+#             except UserProfile.DoesNotExist:
+#                 return JsonResponse({'error': 'User not found'}, status=404)
+
+#             # Fetch product
+#             try:
+#                 product = Product.objects.get(id=product_id)
+#             except Product.DoesNotExist:
+#                 return JsonResponse({'error': 'Product not found'}, status=404)
+
+#             # Create a Purchase instance
+#             Purchase.objects.create(user=user_profile, product=product)
+
+#             return JsonResponse({'message': 'Add successful!'})
+
+#         except json.JSONDecodeError:
+#             return JsonResponse({'error': 'Invalid JSON'}, status=400)
+#         except Exception as e:
+#             # Log the exception for debugging
+#             # You should log the exception e here using Django's logging framework
+#             return JsonResponse({'error': 'Something went wrong', 'details': str(e)}, status=500)
+
+#     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 @csrf_exempt
 def checkout(request):
     if request.method == 'POST':
@@ -47,12 +86,19 @@ def checkout(request):
             if not products.exists():
                 return JsonResponse({'error': 'Invalid cart items'}, status=400)
 
-            # Create a Purchase instance
-            purchase = Purchase.objects.create(user=user_profile)
-            purchase.products.set(products)
-            purchase.save()
+            # Check if a purchase already exists for the user
+            try:
+                purchase = Purchase.objects.get(user=user_profile)
+                # Update existing purchase with new products
+                purchase.products.set(products)
+                purchase.save()
+            except Purchase.DoesNotExist:
+                # Create a new purchase if it doesn't exist
+                purchase = Purchase.objects.create(user=user_profile)
+                purchase.products.set(products)
+                purchase.save()
 
-            # Create a Transaction instance
+            # Create a new Transaction instance
             transaction = Transaction.objects.create(
                 user=user_profile,
                 purchase=purchase,

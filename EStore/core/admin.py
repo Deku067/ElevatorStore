@@ -9,6 +9,7 @@ class ProductInline(admin.TabularInline):
     verbose_name = "Product"
     verbose_name_plural = "Products"
 
+
 @admin.register(Product)
 class Product(admin.ModelAdmin):
     list_display = ('name', 'price', 'kind', 'count', 'manufacturer')
@@ -18,13 +19,17 @@ class Product(admin.ModelAdmin):
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'total_amount', 'get_discounted_amount', 'purchase')
+    list_display = ('user', 'total_amount', 'get_discounted_amount', 'purchase','get_products')
     list_filter = ('user',)
     search_fields = ('user__username',)
 
     def get_discounted_amount(self, obj):
         return obj.calculate_discounted_amount()
     get_discounted_amount.short_description = 'Discounted Amount'
+
+    def get_products(self, obj):
+        return obj.get_products()
+    get_products.short_description = 'Products'
 
 
 

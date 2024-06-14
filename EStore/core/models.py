@@ -39,6 +39,8 @@ class Product(models.Model):
     manufacturer = models.CharField(max_length=3, choices=COUNTRY_CHOICES, default=DEFAULT_COUNTRY)
     category = models.CharField(max_length=4, choices=CATEGORY_CHOICES, default=DEFAULT_CATEGORY)
     description = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to='products/' ,null=True, blank=True)
+
 
     def __str__(self):
         return self.name
@@ -71,6 +73,11 @@ class Transaction(models.Model):
             discount_amount = self.total_amount * (Decimal(self.discount) / Decimal('100'))
             return self.total_amount - discount_amount
         return self.total_amount
+    
+    def get_products(self):
+        if self.purchase:
+            return ", ".join([product.name for product in self.purchase.products.all()])
+        return "No products"
 
     def __str__(self):
         return f"Transaction {self.id} by {self.user}"
